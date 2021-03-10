@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import TodoContext from '../todoContext';
 
 export default function TodoList(props) {
-  const { todoList, doTodo, undoTodo } = props;
+  const { todoList } = props;
+  const dispatch = useContext(TodoContext);
+  const doTodo = id => dispatch({ type: 'DO_TODO', id });
+  const undoTodo = id => dispatch({ type: 'UNDO_TODO', id });
   return (
     <ul>
       {todoList.map(todo => (
