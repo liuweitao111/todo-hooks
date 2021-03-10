@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import TodoList from './TodoList';
 import AddTodo from './AddTodo';
@@ -23,29 +23,19 @@ const initialTodo = [
   },
 ];
 
-const todoReducer = (state, action) => {
-  switch (action.type) {
-    case 'ADD': 
-      return state.concat([{
-        id: uuid(),
-        task: action.value,
-        complete: false,
-      }]);
-    case 'DO_TODO': 
-      return state.map(
-        todo => todo.id !== action.id ? todo : { ...todo, complete: true }
-      );
-    case 'UNDO_TODO': 
-      return state.map(
-        todo => todo.id !== action.id ? todo : { ...todo, complete: false }
-      );
-    default:
-      throw new Error();
-  };
-}
-
 function App() {
-  const [ todoList, dispatch ] = useReducer(todoReducer, initialTodo);
+  const [todoList, setTodoList] = useState(initialTodo);
+  const add = value => setTodoList(todoList.concat([{
+    id: uuid(),
+    task: value,
+    complete: false,
+  }]));
+  const doTodo = id => setTodoList(todoList.map(
+    todo => todo.id !== id ? todo : { ...todo, complete: true }
+  ));
+  const undoTodo = id => setTodoList(todoList.map(
+    todo => todo.id !== id ? todo : { ...todo, complete: false }
+  ));
   const [ filter, setFilter ] = useState('all');
   const filteredTodo = todoList.filter(todo => {
     if(filter === 'complete') {
@@ -58,12 +48,12 @@ function App() {
   });
   return (
     <div className="App">
-      <AddTodo add={ value => dispatch({ type: 'ADD', value })} />
+      <AddTodo add={ add } />
       <Filter setFilter={ setFilter } filter={ filter } />
       <TodoList
         todoList={ filteredTodo }
-        doTodo={ id => dispatch({ type: 'DO_TODO', id }) }
-        undoTodo={ id => dispatch({ type: 'UNDO_TODO', id }) }
+        doTodo={ doTodo }
+        undoTodo={ undoTodo }
       />
     </div>
   );
